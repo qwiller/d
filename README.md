@@ -1,74 +1,56 @@
-银河麒麟智能问答助手 v2.6.0
-基于DeepSeek-R1 API和麒麟SDK2.5的智能问答系统，专为银河麒麟操作系统设计。
+# 银河麒麟智能问答助手 v2.6.0
 
-🌟 功能特性
-智能问答: 基于RAG(检索增强生成)技术，结合本地文档知识库和AI大模型
-多模态交互: 支持语音输入和语音播报功能 🆕
-现代化界面: 全新设计的GUI界面，提升用户体验 🆕
-文档处理: 支持PDF、Markdown、文本等多种格式文档
-系统集成: 深度集成麒麟SDK2.5，获取系统信息和硬件状态
-多架构支持: 支持x86_64和ARM64架构
-语音功能: 集成语音识别和语音合成 🆕
-📋 系统要求
-推荐环境
-操作系统: 银河麒麟 V10 SP1/SP2/SP3 或更高版本
-Python版本: Python 3.7+ (推荐Python 3.8+)
-内存: 4GB以上 (推荐8GB)
-存储: 2GB可用空间
-网络: 需要互联网连接访问DeepSeek API
-音频设备: 支持语音功能需要麦克风和扬声器 🆕
-必需依赖
-麒麟SDK2.5开发库
-DeepSeek API访问权限
-Python第三方库（见requirements.txt）
-音频系统依赖（portaudio、espeak等） 🆕
-🚀 快速安装指南
-方法一：一键安装（推荐）
+基于硅基流动API和麒麟SDK2.5的智能问答系统，专为银河麒麟操作系统设计。
 
-1. 下载项目
+## 🌟 功能特性
 
-# 使用git克隆（推荐）
+- **智能问答**: 基于RAG(检索增强生成)技术，结合本地文档知识库和硅基流动AI大模型
+- **多模态交互**: 支持语音输入和语音播报功能 🆕
+- **现代化界面**: 全新设计的GUI界面，提升用户体验 🆕
+- **文档处理**: 支持PDF、Markdown、文本等多种格式文档
+- **系统集成**: 深度集成麒麟SDK2.5，获取系统信息和硬件状态
+- **多架构支持**: 支持x86_64和ARM64架构
+- **语音功能**: 集成语音识别和语音合成 🆕
 
-git clone https://github.com/your-username/kylin-qa-assistant.git
-cd kylin-qa-assistant
+## 📋 系统要求
 
-# 或者下载ZIP包并解压
+### 推荐环境
 
-wget https://github.com/your-username/kylin-qa-assistant/archive/main.zip
-unzip main.zip
-cd kylin-qa-assistant-main
-2. 运行安装脚本
+- **操作系统**: 银河麒麟 V10 SP1/SP2/SP3 或更高版本
+- **Python版本**: Python 3.7+ (推荐Python 3.8+)
+- **内存**: 4GB以上 (推荐8GB)
+- **存储**: 2GB可用空间
+- **网络**: 需要互联网连接访问硅基流动API
+- **音频设备**: 支持语音功能需要麦克风和扬声器 🆕
 
-# 给安装脚本执行权限
+### 必需依赖
 
-chmod +x install.sh
+- 麒麟SDK2.5开发库
+- 硅基流动API访问权限
+- Python第三方库（见requirements.txt）
+- 音频系统依赖（portaudio、espeak等） 🆕
 
-# 运行安装脚本（需要sudo权限）
+## 🔑 获取硅基流动API密钥
 
-sudo ./install.sh
-安装脚本将自动完成以下操作：
+1. 访问 [硅基流动官网](https://siliconflow.cn/)
+2. 注册账号并登录
+3. 进入API管理页面
+4. 创建新的API密钥
+5. 复制密钥并填入配置文件
 
-✅ 检查系统兼容性
-✅ 安装Python依赖包
-✅ 配置语音功能依赖 🆕
-✅ 配置系统服务
-✅ 创建桌面快捷方式
-✅ 设置命令行快捷方式
-3. 配置语音功能（可选） 🆕
+**注意**: 硅基流动为新用户提供免费额度，请妥善保管您的API密钥。
 
-# 安装语音系统依赖
+## 📖 使用指南
 
-chmod +x setup_voice.sh
-sudo ./setup_voice.sh
-4. 配置API密钥
+### 配置API密钥
 
+```bash
 # 编辑配置文件
-
 sudo nano /opt/kylin-qa-assistant/config.py
 
-# 修改以下行，填入您的DeepSeek API密钥
-
-DEEPSEEK_API_KEY = "your-actual-api-key-here"
+# 修改以下行，填入您的硅基流动API密钥
+SILICONFLOW_API_KEY = "your-actual-api-key-here"
+```
 5. 启动程序
 
 # 方法1：使用桌面快捷方式

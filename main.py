@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-银河麒麟智能问答助手 - 主程序入口
-基于DeepSeek-R1 API和麒麟SDK2.5
+银河麒麟智能问答助手
+基于硅基流动API和麒麟SDK2.5
 """
 
 import sys

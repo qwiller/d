@@ -10,22 +10,25 @@ from vector_store import VectorStore
 from document_processor import DocumentProcessor
 from system_info_helper import KylinSystemInfo
 from config import RAG_CONFIG
+from ai_models import SiliconFlowAPI
 
 class RAGEngine:
     """
-    RAG引擎类
+    RAG (检索增强生成) 引擎
     """
     
     def __init__(self):
+        self.vector_store = VectorStore()
+        self.document_processor = DocumentProcessor()
+        self.ai_model = SiliconFlowAPI()
         self.logger = logging.getLogger(__name__)
         
-        # 初始化组件
-        self.ai_model = DeepSeekAPI()
-        self.vector_store = VectorStore()
-        self.doc_processor = DocumentProcessor()
-        self.system_info = KylinSystemInfo()
-        
-        self.logger.info("RAG引擎初始化完成")
+        # 初始化系统信息助手
+        try:
+            self.system_helper = KylinSystemInfo()
+        except Exception as e:
+            self.logger.warning(f"系统信息助手初始化失败: {e}")
+            self.system_helper = None
     
     def add_documents(self, file_paths: List[str]):
         """

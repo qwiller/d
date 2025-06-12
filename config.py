@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-银河麒麟智能问答助手配置文件 - 基于SDK2.5更新
+银河麒麟智能问答助手配置文件 - 基于硅基流动API和麒麟SDK2.5
 """
 
 import os
@@ -9,11 +9,11 @@ import platform
 # 应用版本信息
 APP_VERSION = "2.6.0"
 APP_NAME = "银河麒麟智能问答助手"
-APP_DESCRIPTION = "基于DeepSeek-R1 API和麒麟SDK2.5的智能问答系统"
+APP_DESCRIPTION = "基于硅基流动API和麒麟SDK2.5的智能问答系统"
 
-# DeepSeek-R1 API 配置
-DEEPSEEK_API_KEY = "YOUR_API_KEY_HERE"
-DEEPSEEK_API_ENDPOINT = "https://api.deepseek.com/v1/chat/completions"
+# 硅基流动 API 配置
+SILICONFLOW_API_KEY = "YOUR_API_KEY_HERE"
+SILICONFLOW_API_ENDPOINT = "https://api.siliconflow.cn/v1/chat/completions"
 
 # 文档路径配置
 DOCUMENT_PATH = "./docs"
@@ -56,26 +56,23 @@ SUPPORTED_DOC_TYPES = {
 
 # 语音配置
 VOICE_CONFIG = {
-    "language": "zh-CN",
-    "rate": 150,
-    "volume": 0.8,
-    "voice_id": 0  # 语音ID
+    "recognition_language": "zh-CN",
+    "speech_rate": 150,
+    "speech_volume": 0.8,
+    "timeout": 5,
+    "phrase_timeout": 1
 }
 
 # GUI配置
 GUI_CONFIG = {
-    "window_title": "银河麒麟智能问答助手 v2.5",
-    "window_size": "1000x750",
-    "font_family": "SimHei",
-    "font_size": 12,
-    "theme": "default",  # 主题
-    "icon_path": "./assets/icon.png"
+    "window_title": "银河麒麟智能问答助手 v2.6.0",
+    "window_size": "1200x800",
+    "theme": "default"
 }
 
 # 日志配置
 LOG_CONFIG = {
     "level": "INFO",
-    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     "file": "./logs/app.log",
     "max_size": 10 * 1024 * 1024,  # 10MB
     "backup_count": 5
@@ -85,9 +82,7 @@ LOG_CONFIG = {
 VECTOR_CONFIG = {
     "chunk_size": 500,
     "chunk_overlap": 50,
-    "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-    "similarity_threshold": 0.7,
-    "max_results": 10
+    "embedding_model": "text-embedding-ada-002"
 }
 
 # RAG配置
@@ -101,72 +96,46 @@ RAG_CONFIG = {
 
 # 系统配置
 SYSTEM_CONFIG = {
-    "check_kylin_system": True,
-    "enable_system_info": True,
-    "enable_hardware_info": True,
-    "enable_network_info": True,
-    "auto_detect_encoding": True
+    "max_file_size": 50 * 1024 * 1024,  # 50MB
+    "supported_languages": ["zh-CN", "en-US"]
 }
 
 # 安全配置
 SECURITY_CONFIG = {
-    "max_file_size": 50 * 1024 * 1024,  # 50MB
-    "allowed_file_types": list(SUPPORTED_DOC_TYPES.keys()),
-    "scan_uploads": True
+    "api_timeout": 30,
+    "max_retries": 3
 }
 
 # 性能配置
 PERFORMANCE_CONFIG = {
     "max_concurrent_processes": 4,
     "cache_size": 100,
-    "enable_gpu": False,
     "batch_size": 32
 }
 
 # 开发配置
-DEVELOPMENT_CONFIG = {
-    "debug_mode": False,
-    "enable_profiling": False,
-    "mock_api_calls": False
+DEV_CONFIG = {
+    "debug": False,
+    "log_api_calls": False
 }
 
-# 获取配置函数
-def get_config(section: str = None):
-    """
-    获取配置信息
-    """
-    if section:
-        return globals().get(f"{section.upper()}_CONFIG", {})
-    else:
-        return {
-            "deepseek": {"api_key": DEEPSEEK_API_KEY, "endpoint": DEEPSEEK_API_ENDPOINT},
-            "kylin_sdk": KYLIN_SDK_CONFIG,
-            "vector": VECTOR_CONFIG,
-            "rag": RAG_CONFIG,
-            "gui": GUI_CONFIG,
-            "log": LOG_CONFIG,
-            "system": SYSTEM_CONFIG,
-            "security": SECURITY_CONFIG,
-            "performance": PERFORMANCE_CONFIG
-        }
+# API配置映射
+API_CONFIGS = {
+    "siliconflow": {"api_key": SILICONFLOW_API_KEY, "endpoint": SILICONFLOW_API_ENDPOINT},
+}
 
-# 验证配置
+def get_config(key, default=None):
+    """获取配置值"""
+    return globals().get(key, default)
+
 def validate_config():
-    """
-    验证配置有效性
-    """
+    """验证配置"""
     issues = []
     
-    # 检查API密钥
-    if not DEEPSEEK_API_KEY or DEEPSEEK_API_KEY == "YOUR_API_KEY_HERE":
-        issues.append("DeepSeek API密钥未配置")
+    if not SILICONFLOW_API_KEY or SILICONFLOW_API_KEY == "YOUR_API_KEY_HERE":
+        issues.append("硅基流动API密钥未配置")
     
-    # 检查必要目录
-    for path in [DOCUMENT_PATH, os.path.dirname(VECTOR_DB_PATH), os.path.dirname(LOG_CONFIG['file'])]:
-        if not os.path.exists(path):
-            try:
-                os.makedirs(path, exist_ok=True)
-            except Exception as e:
-                issues.append(f"无法创建目录 {path}: {str(e)}")
+    if not os.path.exists(DOCUMENT_PATH):
+        issues.append(f"文档路径不存在: {DOCUMENT_PATH}")
     
     return issues
