@@ -1,124 +1,159 @@
 # -*- coding: utf-8 -*-
 """
-AI模型接口模块 - DeepSeek-R1 API集成
+AI模型接口模块 - 硅基流动API集成
 """
 
 import requests
 import json
 import logging
-from typing import Dict, List, Any, Optional
-from config import DEEPSEEK_API_KEY, DEEPSEEK_API_ENDPOINT, RAG_CONFIG
+from typing import List, Dict, Any, Optional
+from config import SILICONFLOW_API_KEY, SILICONFLOW_API_ENDPOINT, RAG_CONFIG
 
-class DeepSeekAPI:
+class SiliconFlowAPI:
     """
-    DeepSeek-R1 API接口类
+    硅基流动API接口类
     """
     
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or DEEPSEEK_API_KEY
-        self.endpoint = DEEPSEEK_API_ENDPOINT
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or SILICONFLOW_API_KEY
+        self.endpoint = SILICONFLOW_API_ENDPOINT
         self.logger = logging.getLogger(__name__)
         
         if not self.api_key or self.api_key == "YOUR_API_KEY_HERE":
-            self.logger.warning("DeepSeek API密钥未配置")
+            self.logger.warning("硅基流动API密钥未配置")
     
-    def generate_response(self, messages: List[Dict[str, str]], 
-                         temperature: float = None,
-                         max_tokens: int = None) -> Optional[str]:
+    def chat_completion(self, messages: List[Dict[str, str]], 
+                       model: str = "Qwen/Qwen2.5-72B-Instruct",
+                       temperature: float = 0.7,
+                       max_tokens: int = 1000,
+                       stream: bool = False) -> Dict[str, Any]:
         """
-        生成AI响应
+        调用硅基流动聊天完成API
         
         Args:
             messages: 对话消息列表
+            model: 模型名称，默认使用Qwen2.5-72B-Instruct
             temperature: 温度参数
             max_tokens: 最大token数
+            stream: 是否流式输出
             
         Returns:
-            AI生成的响应文本
+            API响应结果
         """
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            'model': model,
+            'messages': messages,
+            'temperature': temperature,
+            'max_tokens': max_tokens,
+            'stream': stream
+        }
+        
         try:
-            headers = {
-                'Authorization': f'Bearer {self.api_key}',
-                'Content-Type': 'application/json'
-            }
-            
-            data = {
-                'model': 'deepseek-reasoner',
-                'messages': messages,
-                'temperature': temperature or RAG_CONFIG.get('temperature', 0.7),
-                'max_tokens': max_tokens or RAG_CONFIG.get('max_tokens', 1000),
-                'stream': False
-            }
-            
             response = requests.post(
                 self.endpoint,
                 headers=headers,
-                json=data,
+                json=payload,
                 timeout=30
             )
+            response.raise_for_status()
+            return response.json()
             
-            if response.status_code == 200:
-                result = response.json()
-                return result['choices'][0]['message']['content']
-            else:
-                self.logger.error(f"API请求失败: {response.status_code} - {response.text}")
-                return None
-                
-        except Exception as e:
-            self.logger.error(f"生成响应失败: {str(e)}")
-            return None
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"硅基流动API调用失败: {e}")
+            return {"error": str(e)}
     
-    def build_system_prompt(self, context: str = "") -> str:
+    def generate_answer(self, question: str, context: str = "", 
+                       include_system_info: bool = False,
+                       system_info: str = "") -> str:
         """
-        构建系统提示词
-        
-        Args:
-            context: 上下文信息
-            
-        Returns:
-            系统提示词
-        """
-        base_prompt = """
-你是银河麒麟操作系统的智能问答助手，专门帮助用户解决麒麟系统相关的问题。
-
-你的能力包括：
-1. 回答银河麒麟系统的使用问题
-2. 提供系统配置和故障排除建议
-3. 解释麒麟SDK2.5的接口和功能
-4. 协助进行系统管理和维护
-
-回答要求：
-- 使用中文回答
-- 提供准确、实用的信息
-- 如果不确定，请明确说明
-- 优先使用提供的上下文信息
-"""
-        
-        if context:
-            base_prompt += f"\n\n相关文档内容：\n{context}"
-        
-        return base_prompt
-    
-    def answer_question(self, question: str, context: str = "") -> Optional[str]:
-        """
-        回答用户问题
+        生成问答回复
         
         Args:
             question: 用户问题
-            context: 相关上下文
+            context: 相关文档上下文
+            include_system_info: 是否包含系统信息
+            system_info: 系统信息
             
         Returns:
-            AI回答
+            AI生成的回答
         """
+        # 构建系统提示词
+        system_prompt = """
+你是银河麒麟操作系统的智能助手，专门帮助用户解答关于麒麟系统的问题。
+请基于提供的文档内容和系统信息，给出准确、有用的回答。
+如果问题超出了提供的信息范围，请诚实地说明。
+        """.strip()
+        
+        # 构建用户消息
+        user_message = f"问题：{question}"
+        
+        if context:
+            user_message += f"\n\n相关文档：\n{context}"
+        
+        if include_system_info and system_info:
+            user_message += f"\n\n当前系统信息：\n{system_info}"
+        
         messages = [
-            {
-                "role": "system",
-                "content": self.build_system_prompt(context)
-            },
-            {
-                "role": "user",
-                "content": question
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message}
         ]
         
-        return self.generate_response(messages)
+        # 调用API
+        response = self.chat_completion(
+            messages=messages,
+            temperature=RAG_CONFIG.get('temperature', 0.7),
+            max_tokens=RAG_CONFIG.get('max_tokens', 1000)
+        )
+        
+        if "error" in response:
+            return f"抱歉，生成回答时出现错误：{response['error']}"
+        
+        try:
+            return response['choices'][0]['message']['content']
+        except (KeyError, IndexError) as e:
+            self.logger.error(f"解析API响应失败: {e}")
+            return "抱歉，无法解析AI回答，请稍后重试。"
+    
+    def get_available_models(self) -> List[str]:
+        """
+        获取可用的模型列表
+        
+        Returns:
+            可用模型列表
+        """
+        # 硅基流动支持的主要模型
+        return [
+            "Qwen/Qwen2.5-72B-Instruct",
+            "Qwen/Qwen2.5-32B-Instruct", 
+            "Qwen/Qwen2.5-14B-Instruct",
+            "Qwen/Qwen2.5-7B-Instruct",
+            "Pro/deepseek-ai/DeepSeek-R1",
+            "deepseek-ai/DeepSeek-V3",
+            "01-ai/Yi-1.5-34B-Chat",
+            "meta-llama/Llama-3.1-70B-Instruct",
+            "meta-llama/Llama-3.1-8B-Instruct",
+            "THUDM/glm-4-9b-chat"
+        ]
+    
+    def test_connection(self) -> bool:
+        """
+        测试API连接
+        
+        Returns:
+            连接是否成功
+        """
+        test_messages = [
+            {"role": "user", "content": "你好"}
+        ]
+        
+        response = self.chat_completion(
+            messages=test_messages,
+            max_tokens=10
+        )
+        
+        return "error" not in response
