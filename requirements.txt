@@ -1,0 +1,30 @@
+# 核心依赖
+numpy>=1.21.0
+scikit-learn>=1.0.0
+requests>=2.25.0
+
+# 文档处理
+PyPDF2>=3.0.0
+markdown>=3.3.0
+beautifulsoup4>=4.9.0
+
+# 语音功能
+SpeechRecognition>=3.8.0
+pyttsx3>=2.90
+pyaudio>=0.2.11
+
+# 更好的PDF处理
+pdfplumber>=0.6.0
+
+# 文本处理
+nltk>=3.6.0
+jieba>=0.42.0
+
+# 配置管理
+pyyaml>=5.4.0
+
+# 银河麒麟系统特定（如果在麒麟系统上运行）
+# 这些包需要在银河麒麟系统上通过apt安装
+# libkysdk-system-python
+# libkysdk-hardware-python
+# libkysdk-applications-python
