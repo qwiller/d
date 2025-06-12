@@ -58,7 +58,7 @@ systemctl enable kylin-qa.service
 echo "创建桌面快捷方式..."
 cat > /home/kylin/Desktop/kylin-qa.desktop << EOF
 [Desktop Entry]
-Version=1.0
+Version=2.6.0
 Type=Application
 Name=银河麒麟智能问答助手
 Comment=基于AI的银河麒麟系统智能问答助手

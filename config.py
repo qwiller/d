@@ -6,6 +6,11 @@
 import os
 import platform
 
+# 应用版本信息
+APP_VERSION = "2.6.0"
+APP_NAME = "银河麒麟智能问答助手"
+APP_DESCRIPTION = "基于DeepSeek-R1 API和麒麟SDK2.5的智能问答系统"
+
 # DeepSeek-R1 API 配置
 DEEPSEEK_API_KEY = "YOUR_API_KEY_HERE"
 DEEPSEEK_API_ENDPOINT = "https://api.deepseek.com/v1/chat/completions"
