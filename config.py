@@ -28,18 +28,29 @@ elif ARCH in ['x86_64', 'amd64']:
 else:
     LIB_ARCH = "linux-gnu"
 
-# 麒麟SDK2.5配置
+# 麒麟SDK2.5完整配置 - 基于开发指南要求
 KYLIN_SDK_CONFIG = {
     "version": "2.5",
+    "required_packages": [
+        "libkysdk-base-dev",
+        "libkysdk-system-dev", 
+        "libkysdk-desktop-dev",
+        "libkysdk-security-dev",
+        "libkysdk-coreai-vision-dev"
+    ],
     "system_lib_path": f"/usr/lib/{LIB_ARCH}/libkysysinfo.so",
     "hardware_lib_path": f"/usr/lib/{LIB_ARCH}/libkyhardware.so",
     "time_lib_path": f"/usr/lib/{LIB_ARCH}/libkydate.so",
     "package_lib_path": f"/usr/lib/{LIB_ARCH}/libkypackage.so",
+    "ai_lib_path": f"/usr/lib/{LIB_ARCH}/libkycoreai.so",
+    "security_lib_path": f"/usr/lib/{LIB_ARCH}/libkysecurity.so",
     "fallback_paths": [
         "/usr/lib/libkysysinfo.so",
         "/usr/local/lib/libkysysinfo.so",
         "./lib/libkysysinfo.so"
-    ]
+    ],
+    "auto_install": True,  # 启用自动安装
+    "install_source": "http://archive.kylinos.cn/kylin/KYLIN-ALL"
 }
 
 # 支持的文档类型（基于SDK2.5文档格式）

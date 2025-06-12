@@ -211,17 +211,63 @@ class KylinSystemInfo:
         
         return info
     
+    # 在现有代码基础上添加更多SDK功能
+    
     def get_hardware_info(self) -> Dict[str, Any]:
         """
-        获取硬件信息
+        获取硬件信息 - 基于麒麟SDK硬件接口
         """
         info = {}
         
         if self.libs.get('hardware'):
-            info.update(self._get_sdk_hardware_info())
+            lib = self.libs['hardware']
+            try:
+                # 获取CPU信息
+                if hasattr(lib, 'kdk_hw_get_cpuinfo'):
+                    cpu_info = lib.kdk_hw_get_cpuinfo()
+                    if cpu_info:
+                        info['CPU详细信息'] = self._parse_cpu_info(cpu_info)
+                    
+                # 获取内存信息
+                if hasattr(lib, 'kdk_hw_get_meminfo'):
+                    mem_info = lib.kdk_hw_get_meminfo()
+                    if mem_info:
+                        info['内存详细信息'] = self._parse_memory_info(mem_info)
+                    
+                # 获取磁盘信息
+                if hasattr(lib, 'kdk_hw_get_diskinfo'):
+                    disk_info = lib.kdk_hw_get_diskinfo()
+                    if disk_info:
+                        info['磁盘详细信息'] = self._parse_disk_info(disk_info)
+                        
+            except Exception as e:
+                self.logger.error(f"获取硬件信息失败: {str(e)}")
         
-        # 补充系统命令获取的硬件信息
-        info.update(self._get_command_hardware_info())
+        return info
+    
+    def get_security_status(self) -> Dict[str, Any]:
+        """
+        获取系统安全状态 - 基于麒麟SDK安全接口
+        """
+        info = {}
+        
+        if self.libs.get('security'):
+            lib = self.libs['security']
+            try:
+                # 获取安全等级
+                if hasattr(lib, 'kdk_sec_get_level'):
+                    sec_level = lib.kdk_sec_get_level()
+                    if sec_level >= 0:
+                        levels = ['无', '低', '中', '高', '极高']
+                        info['安全等级'] = levels[min(sec_level, len(levels)-1)]
+                    
+                # 获取防火墙状态
+                if hasattr(lib, 'kdk_sec_get_firewall_status'):
+                    fw_status = lib.kdk_sec_get_firewall_status()
+                    info['防火墙状态'] = '启用' if fw_status else '禁用'
+                    
+            except Exception as e:
+                self.logger.error(f"获取安全信息失败: {str(e)}")
         
         return info
     
